@@ -183,7 +183,8 @@ function Invoke-ReleaseAndDeployProject {
   $release = New-JawsRelease -credential $credential -projectId $projectId -version $version
   $deployment = Invoke-JawsDeployRelease -credential $credential -releaseId $release.releaseId -environmentName $environmentName
 
-  $final = Start-JawsCheckDeploymentState -credential $credential -deploymentId $deployment.deploymentId
+  # TODO: support mutl-deployment calls
+  $final = Start-JawsCheckDeploymentState -credential $credential -deploymentId $deployment.deploymentIds[0]
   return $final
 }
 
@@ -213,7 +214,8 @@ function Invoke-PromoteRelease {
 
   $deployment = Invoke-JawsApi -endpoint "release/promote" -payload $payload -credential $credential
 
-  $final = Start-JawsCheckDeploymentState -credential $credential -deploymentId $deployment.deploymentId
+  # TODO: support mutl-deployment calls
+  $final = Start-JawsCheckDeploymentState -credential $credential -deploymentId $deployment.deploymentIds[0]
   return $final
 }
 
