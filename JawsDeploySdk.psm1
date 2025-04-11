@@ -54,7 +54,7 @@ function Invoke-JawsApi {
     $apiBaseUrl = "https://app.jawsdeploy.net/api"
   }
 	
-  $endpoint = !$endpoint ? "" : $endpoint.TrimStart('/')
+  $endpoint = if (!$endpoint) { "" } else { $endpoint.TrimStart('/') }
   $contentType = $null
 
   if ([string]::Equals($method, "post", [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -215,4 +215,23 @@ function Invoke-PromoteRelease {
 
   $final = Start-JawsCheckDeploymentState -credential $credential -deploymentId $deployment.deploymentId
   return $final
+}
+
+function Test-JawsDeploymentResult($jawsResult) {
+  if (!$jawsResult) {
+    Write-Error "no response from Invoke-ReleaseAndDeployProject - expected final deployment status from Jaws api"
+    exit 1
+  }
+  if (!$jawsResult.status) {
+    Write-Error "response from Invoke-ReleaseAndDeployProject does not contain status"
+    exit 1
+  }
+  if ($jawsResult.status.Status -ne "Completed") {
+    Write-Error "deployment completed with status $($jawsResult.status.Status)"
+    exit 1
+  }
+  if ($jawsResult.status.ErrorCount -gt 0) {
+    Write-Error "deployment completed with $($jawsResult.status.ErrorCount) errors - failing this step"
+    exit 1
+  }
 }
