@@ -74,12 +74,44 @@ function New-JawsRelease {
     [string]$projectId,
 		
     [Parameter(Mandatory = $false)]
-    [string]$version = $null
+    [string]$version = $null,
+
+    [Parameter(Mandatory = $false)]
+    [string]$channelName = $null,
+    
+    [Parameter(Mandatory = $false)]
+    [bool]$ignoreDefaultChannel = $false,
+    
+    [Parameter(Mandatory = $false)]
+    [string]$notes = $null,
+    
+    [Parameter(Mandatory = $false)]
+    [hashtable]$packageVersions = @{}
   )
 
   $payload = @{
-    projectid = $projectId;
-    version   = $version
+    projectid = $projectId
+  }
+
+  # Add optional parameters only if they have values
+  if ($version) { 
+    $payload.version = $version 
+  }
+  
+  if ($channelName) { 
+    $payload.channelName = $channelName 
+  }
+  
+  if ($ignoreDefaultChannel) { 
+    $payload.ignoreDefaultChannel = $ignoreDefaultChannel 
+  }
+  
+  if ($notes) { 
+    $payload.notes = $notes 
+  }
+  
+  if ($packageVersions.Count -gt 0) { 
+    $payload.packageVersions = $packageVersions 
   }
 
   return Invoke-JawsApi -endpoint "release" -payload $payload -credential $credential
